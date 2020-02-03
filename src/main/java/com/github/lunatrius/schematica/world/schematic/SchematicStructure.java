@@ -1,6 +1,5 @@
 package com.github.lunatrius.schematica.world.schematic;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
