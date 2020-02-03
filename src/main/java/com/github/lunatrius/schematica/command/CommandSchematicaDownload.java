@@ -1,6 +1,5 @@
 package com.github.lunatrius.schematica.command;
 
-import com.github.lunatrius.core.util.FileUtils;
 import com.github.lunatrius.schematica.Schematica;
 import com.github.lunatrius.schematica.api.ISchematic;
 import com.github.lunatrius.schematica.handler.DownloadHandler;
@@ -20,7 +19,12 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentTranslation;
 
 import javax.annotation.ParametersAreNonnullByDefault;
+
+import org.apache.commons.io.FilenameUtils;
+
 import java.io.File;
+import java.io.IOError;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -75,10 +79,14 @@ public class CommandSchematicaDownload extends CommandSchematicaBase {
         final String filename = String.join(" ", args);
         final EntityPlayerMP player = (EntityPlayerMP) sender;
         final File directory = Schematica.proxy.getPlayerSchematicDirectory(player, true);
-        if (!FileUtils.contains(directory, filename)) {
-            Reference.logger.error("{} has tried to download the file {}", player.getName(), filename);
-            throw new CommandException(Names.Command.Download.Message.DOWNLOAD_FAILED);
-        }
+        try {
+			if (!FilenameUtils.directoryContains(directory.getCanonicalPath(), filename)) {
+			    Reference.logger.error("{} has tried to download the file {}", player.getName(), filename);
+			    throw new CommandException(Names.Command.Download.Message.DOWNLOAD_FAILED);
+			}
+		} catch (IOException e) {
+			throw new IOError(e);
+		}
 
         final ISchematic schematic = SchematicFormat.readFromFile(directory, filename);
 

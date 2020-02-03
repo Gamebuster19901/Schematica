@@ -1,7 +1,5 @@
 package com.github.lunatrius.schematica.client.util;
 
-import com.github.lunatrius.core.util.math.BlockPosHelper;
-import com.github.lunatrius.core.util.math.MBlockPos;
 import com.github.lunatrius.schematica.api.ISchematic;
 import com.github.lunatrius.schematica.block.state.BlockStateHelper;
 import com.github.lunatrius.schematica.client.world.SchematicWorld;
@@ -58,48 +56,52 @@ public class RotationHelper {
     }
 
     private void updatePosition(final SchematicWorld world, final EnumFacing axis) {
+    	int x = world.position.getX();
+    	int y = world.position.getY();
+    	int z = world.position.getZ();
         switch (axis) {
-        case DOWN:
-        case UP: {
-            final int offset = (world.getWidth() - world.getLength()) / 2;
-            world.position.x += offset;
-            world.position.z -= offset;
-            break;
+	        case DOWN:
+	        case UP: {
+	            final int offset = (world.getWidth() - world.getLength()) / 2;
+	            x += offset;
+	            z -= offset;
+	            break;
+	        }
+	
+	        case NORTH:
+	        case SOUTH: {
+	            final int offset = (world.getWidth() - world.getHeight()) / 2;
+	            x += offset;
+	            y -= offset;
+	            break;
+	        }
+	
+	        case WEST:
+	        case EAST: {
+	            final int offset = (world.getHeight() - world.getLength()) / 2;
+	            y += offset;
+	            z -= offset;
+	            break;
+	        }
         }
-
-        case NORTH:
-        case SOUTH: {
-            final int offset = (world.getWidth() - world.getHeight()) / 2;
-            world.position.x += offset;
-            world.position.y -= offset;
-            break;
-        }
-
-        case WEST:
-        case EAST: {
-            final int offset = (world.getHeight() - world.getLength()) / 2;
-            world.position.y += offset;
-            world.position.z -= offset;
-            break;
-        }
-        }
+        
+        world.position = new BlockPos(x, y, z);
     }
 
     public Schematic rotate(final ISchematic schematic, final EnumFacing axis, final boolean forced) throws RotationException {
         final Vec3i dimensionsRotated = rotateDimensions(axis, schematic.getWidth(), schematic.getHeight(), schematic.getLength());
         final Schematic schematicRotated = new Schematic(schematic.getIcon(), dimensionsRotated.getX(), dimensionsRotated.getY(), dimensionsRotated.getZ(), schematic.getAuthor());
-        final MBlockPos tmp = new MBlockPos();
 
-        for (final MBlockPos pos : BlockPosHelper.getAllInBox(0, 0, 0, schematic.getWidth() - 1, schematic.getHeight() - 1, schematic.getLength() - 1)) {
+        for (final BlockPos pos : BlockPos.getAllInBox(0, 0, 0, schematic.getWidth() - 1, schematic.getHeight() - 1, schematic.getLength() - 1)) {
             final IBlockState blockState = schematic.getBlockState(pos);
             final IBlockState blockStateRotated = rotateBlock(blockState, axis, forced);
-            schematicRotated.setBlockState(rotatePos(pos, axis, dimensionsRotated, tmp), blockStateRotated);
+            schematicRotated.setBlockState(rotatePos(pos, axis, dimensionsRotated), blockStateRotated);
         }
 
         final List<TileEntity> tileEntities = schematic.getTileEntities();
         for (final TileEntity tileEntity : tileEntities) {
             final BlockPos pos = tileEntity.getPos();
-            tileEntity.setPos(new BlockPos(rotatePos(pos, axis, dimensionsRotated, tmp)));
+            tileEntity.setPos(new BlockPos(rotatePos(pos, axis, dimensionsRotated)));
             schematicRotated.setTileEntity(tileEntity.getPos(), tileEntity);
         }
 
@@ -124,25 +126,25 @@ public class RotationHelper {
         throw new RotationException("'%s' is not a valid axis!", axis.getName());
     }
 
-    private BlockPos rotatePos(final BlockPos pos, final EnumFacing axis, final Vec3i dimensions, final MBlockPos rotated) throws RotationException {
+    private BlockPos rotatePos(final BlockPos pos, final EnumFacing axis, final Vec3i dimensions) throws RotationException {
         switch (axis) {
         case DOWN:
-            return rotated.set(pos.getZ(), pos.getY(), dimensions.getZ() - 1 - pos.getX());
+            return new BlockPos(pos.getZ(), pos.getY(), dimensions.getZ() - 1 - pos.getX());
 
         case UP:
-            return rotated.set(dimensions.getX() - 1 - pos.getZ(), pos.getY(), pos.getX());
+            return new BlockPos(dimensions.getX() - 1 - pos.getZ(), pos.getY(), pos.getX());
 
         case NORTH:
-            return rotated.set(dimensions.getX() - 1 - pos.getY(), pos.getX(), pos.getZ());
+            return new BlockPos(dimensions.getX() - 1 - pos.getY(), pos.getX(), pos.getZ());
 
         case SOUTH:
-            return rotated.set(pos.getY(), dimensions.getY() - 1 - pos.getX(), pos.getZ());
+            return new BlockPos(pos.getY(), dimensions.getY() - 1 - pos.getX(), pos.getZ());
 
         case WEST:
-            return rotated.set(pos.getX(), dimensions.getY() - 1 - pos.getZ(), pos.getY());
+            return new BlockPos(pos.getX(), dimensions.getY() - 1 - pos.getZ(), pos.getY());
 
         case EAST:
-            return rotated.set(pos.getX(), pos.getZ(), dimensions.getZ() - 1 - pos.getY());
+            return new BlockPos(pos.getX(), pos.getZ(), dimensions.getZ() - 1 - pos.getY());
         }
 
         throw new RotationException("'%s' is not a valid axis!", axis.getName());

@@ -1,10 +1,11 @@
 package com.github.lunatrius.schematica.client.gui.load;
 
-import com.github.lunatrius.core.client.gui.GuiHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiSlot;
 import net.minecraft.client.renderer.Tessellator;
 import org.apache.commons.io.FilenameUtils;
+
+import com.github.lunatrius.schematica.client.gui.GuiHelper;
 
 public class GuiSchematicLoadSlot extends GuiSlot {
     private final Minecraft minecraft = Minecraft.getMinecraft();

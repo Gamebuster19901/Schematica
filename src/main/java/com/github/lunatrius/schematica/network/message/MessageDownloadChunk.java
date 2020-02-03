@@ -1,6 +1,5 @@
 package com.github.lunatrius.schematica.network.message;
 
-import com.github.lunatrius.core.util.math.MBlockPos;
 import com.github.lunatrius.schematica.api.ISchematic;
 import com.github.lunatrius.schematica.handler.DownloadHandler;
 import com.github.lunatrius.schematica.nbt.NBTHelper;
@@ -11,6 +10,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
@@ -42,11 +42,10 @@ public class MessageDownloadChunk implements IMessage, IMessageHandler<MessageDo
         this.tileEntities = new ArrayList<TileEntity>();
         this.entities = new ArrayList<Entity>();
 
-        final MBlockPos pos = new MBlockPos();
         for (int x = 0; x < Constants.SchematicChunk.WIDTH; x++) {
             for (int y = 0; y < Constants.SchematicChunk.HEIGHT; y++) {
                 for (int z = 0; z < Constants.SchematicChunk.LENGTH; z++) {
-                    pos.set(baseX + x, baseY + y, baseZ + z);
+                    BlockPos pos = new BlockPos(baseX + x, baseY + y, baseZ + z);
                     final IBlockState blockState = schematic.getBlockState(pos);
                     final Block block = blockState.getBlock();
                     final int id = Block.REGISTRY.getIDForObject(block);
@@ -62,7 +61,6 @@ public class MessageDownloadChunk implements IMessage, IMessageHandler<MessageDo
     }
 
     private void copyToSchematic(final ISchematic schematic) {
-        final MBlockPos pos = new MBlockPos();
         for (int x = 0; x < Constants.SchematicChunk.WIDTH; x++) {
             for (int y = 0; y < Constants.SchematicChunk.HEIGHT; y++) {
                 for (int z = 0; z < Constants.SchematicChunk.LENGTH; z++) {
@@ -70,7 +68,7 @@ public class MessageDownloadChunk implements IMessage, IMessageHandler<MessageDo
                     final byte meta = this.metadata[x][y][z];
                     final Block block = Block.REGISTRY.getObjectById(id);
 
-                    pos.set(this.baseX + x, this.baseY + y, this.baseZ + z);
+                    BlockPos pos = new BlockPos(this.baseX + x, this.baseY + y, this.baseZ + z);
 
                     schematic.setBlockState(pos, block.getStateFromMeta(meta));
                 }

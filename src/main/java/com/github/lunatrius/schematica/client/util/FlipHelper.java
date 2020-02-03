@@ -1,7 +1,5 @@
 package com.github.lunatrius.schematica.client.util;
 
-import com.github.lunatrius.core.util.math.BlockPosHelper;
-import com.github.lunatrius.core.util.math.MBlockPos;
 import com.github.lunatrius.schematica.api.ISchematic;
 import com.github.lunatrius.schematica.block.state.BlockStateHelper;
 import com.github.lunatrius.schematica.client.world.SchematicWorld;
@@ -51,37 +49,36 @@ public class FlipHelper {
     public Schematic flip(final ISchematic schematic, final EnumFacing axis, final boolean forced) throws FlipException {
         final Vec3i dimensionsFlipped = new Vec3i(schematic.getWidth(), schematic.getHeight(), schematic.getLength());
         final Schematic schematicFlipped = new Schematic(schematic.getIcon(), dimensionsFlipped.getX(), dimensionsFlipped.getY(), dimensionsFlipped.getZ(), schematic.getAuthor());
-        final MBlockPos tmp = new MBlockPos();
 
-        for (final MBlockPos pos : BlockPosHelper.getAllInBox(0, 0, 0, schematic.getWidth() - 1, schematic.getHeight() - 1, schematic.getLength() - 1)) {
+        for (final BlockPos pos : BlockPos.getAllInBox(0, 0, 0, schematic.getWidth() - 1, schematic.getHeight() - 1, schematic.getLength() - 1)) {
             final IBlockState blockState = schematic.getBlockState(pos);
             final IBlockState blockStateFlipped = flipBlock(blockState, axis, forced);
-            schematicFlipped.setBlockState(flipPos(pos, axis, dimensionsFlipped, tmp), blockStateFlipped);
+            schematicFlipped.setBlockState(flipPos(pos, axis, dimensionsFlipped), blockStateFlipped);
         }
 
         final List<TileEntity> tileEntities = schematic.getTileEntities();
         for (final TileEntity tileEntity : tileEntities) {
             final BlockPos pos = tileEntity.getPos();
-            tileEntity.setPos(new BlockPos(flipPos(pos, axis, dimensionsFlipped, tmp)));
+            tileEntity.setPos(new BlockPos(flipPos(pos, axis, dimensionsFlipped)));
             schematicFlipped.setTileEntity(tileEntity.getPos(), tileEntity);
         }
 
         return schematicFlipped;
     }
 
-    private BlockPos flipPos(final BlockPos pos, final EnumFacing axis, final Vec3i dimensions, final MBlockPos flipped) throws FlipException {
+    private BlockPos flipPos(final BlockPos pos, final EnumFacing axis, final Vec3i dimensions) throws FlipException {
         switch (axis) {
         case DOWN:
         case UP:
-            return flipped.set(pos.getX(), dimensions.getY() - 1 - pos.getY(), pos.getZ());
+            return new BlockPos(pos.getX(), dimensions.getY() - 1 - pos.getY(), pos.getZ());
 
         case NORTH:
         case SOUTH:
-            return flipped.set(pos.getX(), pos.getY(), dimensions.getZ() - 1 - pos.getZ());
+            return new BlockPos(pos.getX(), pos.getY(), dimensions.getZ() - 1 - pos.getZ());
 
         case WEST:
         case EAST:
-            return flipped.set(dimensions.getX() - 1 - pos.getX(), pos.getY(), pos.getZ());
+            return new BlockPos(dimensions.getX() - 1 - pos.getX(), pos.getY(), pos.getZ());
         }
 
         throw new FlipException("'%s' is not a valid axis!", axis.getName());

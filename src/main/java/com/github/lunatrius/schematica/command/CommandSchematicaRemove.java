@@ -1,6 +1,5 @@
 package com.github.lunatrius.schematica.command;
 
-import com.github.lunatrius.core.util.FileUtils;
 import com.github.lunatrius.schematica.Schematica;
 import com.github.lunatrius.schematica.reference.Names;
 import com.github.lunatrius.schematica.reference.Reference;
@@ -19,6 +18,8 @@ import net.minecraft.util.text.TextFormatting;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.io.File;
+import java.io.IOError;
+import java.io.IOException;
 import java.util.Arrays;
 
 @MethodsReturnNonnullByDefault
@@ -68,9 +69,14 @@ public class CommandSchematicaRemove extends CommandSchematicaBase {
 
         final File schematicDirectory = Schematica.proxy.getPlayerSchematicDirectory(player, true);
         final File file = new File(schematicDirectory, name);
-        if (!FileUtils.contains(schematicDirectory, file)) {
-            Reference.logger.error("{} has tried to download the file {}", player.getName(), name);
-            throw new CommandException(Names.Command.Remove.Message.SCHEMATIC_NOT_FOUND);
+        try {
+	        if (!file.getCanonicalPath().startsWith(schematicDirectory.getCanonicalPath() + File.separator)) {
+	            Reference.logger.error("{} has tried to download the file {}", player.getName(), name);
+	            throw new CommandException(Names.Command.Remove.Message.SCHEMATIC_NOT_FOUND);
+	        }
+        }
+        catch(IOException e) {
+        	throw new IOError(e);
         }
 
         if (file.exists()) {

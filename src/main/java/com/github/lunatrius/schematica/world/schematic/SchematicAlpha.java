@@ -1,6 +1,5 @@
 package com.github.lunatrius.schematica.world.schematic;
 
-import com.github.lunatrius.core.util.math.MBlockPos;
 import com.github.lunatrius.schematica.api.ISchematic;
 import com.github.lunatrius.schematica.api.event.PreSchematicSaveEvent;
 import com.github.lunatrius.schematica.nbt.NBTHelper;
@@ -63,7 +62,6 @@ public class SchematicAlpha extends SchematicFormat {
             }
         }
 
-        final MBlockPos pos = new MBlockPos();
         final ISchematic schematic = new Schematic(icon, width, height, length);
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
@@ -77,7 +75,7 @@ public class SchematicAlpha extends SchematicFormat {
                     }
 
                     final Block block = Block.REGISTRY.getObjectById(blockID);
-                    pos.set(x, y, z);
+                    BlockPos pos = new BlockPos(x, y, z);
                     try {
                         final IBlockState blockState = block.getStateFromMeta(meta);
                         schematic.setBlockState(pos, blockState);
@@ -122,13 +120,12 @@ public class SchematicAlpha extends SchematicFormat {
         final byte[] extraBlocksNibble = new byte[(int) Math.ceil(size / 2.0)];
         boolean extra = false;
 
-        final MBlockPos pos = new MBlockPos();
         final Map<String, Short> mappings = new HashMap<String, Short>();
         for (int x = 0; x < schematic.getWidth(); x++) {
             for (int y = 0; y < schematic.getHeight(); y++) {
                 for (int z = 0; z < schematic.getLength(); z++) {
                     final int index = x + (y * schematic.getLength() + z) * schematic.getWidth();
-                    final IBlockState blockState = schematic.getBlockState(pos.set(x, y, z));
+                    final IBlockState blockState = schematic.getBlockState(new BlockPos(x, y, z));
                     final Block block = blockState.getBlock();
                     final int blockId = Block.REGISTRY.getIDForObject(block);
                     localBlocks[index] = (byte) blockId;

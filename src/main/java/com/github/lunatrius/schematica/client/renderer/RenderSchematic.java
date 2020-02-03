@@ -1,9 +1,5 @@
 package com.github.lunatrius.schematica.client.renderer;
 
-import com.github.lunatrius.core.client.renderer.GeometryMasks;
-import com.github.lunatrius.core.client.renderer.GeometryTessellator;
-import com.github.lunatrius.core.util.math.MBlockPos;
-import com.github.lunatrius.core.util.vector.Vector3d;
 import com.github.lunatrius.schematica.client.renderer.chunk.OverlayRenderDispatcher;
 import com.github.lunatrius.schematica.client.renderer.chunk.container.SchematicChunkRenderContainer;
 import com.github.lunatrius.schematica.client.renderer.chunk.container.SchematicChunkRenderContainerList;
@@ -52,6 +48,7 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -83,11 +80,11 @@ public class RenderSchematic extends RenderGlobal {
     public static final int PASS = 2;
 
     private static final ShaderProgram SHADER_ALPHA = new ShaderProgram("schematica", null, "shaders/alpha.frag");
-    private static final Vector3d PLAYER_POSITION_OFFSET = new Vector3d();
+    private static Vec3d PLAYER_POSITION_OFFSET = new Vec3d(0,0,0);
     private final Minecraft mc;
     private final Profiler profiler;
     private final RenderManager renderManager;
-    private final MBlockPos tmp = new MBlockPos();
+    private BlockPos tmp = new BlockPos(0, 0, 0);
     private SchematicWorld world;
     private Set<RenderChunk> chunksToUpdate = Sets.newLinkedHashSet();
     private Set<RenderOverlay> overlaysToUpdate = Sets.newLinkedHashSet();
@@ -267,7 +264,7 @@ public class RenderSchematic extends RenderGlobal {
             loadRenderers();
         }
 
-        PLAYER_POSITION_OFFSET.set(ClientProxy.playerPosition).sub(this.world.position.x, this.world.position.y, this.world.position.z);
+        PLAYER_POSITION_OFFSET = ClientProxy.playerPosition.subtract(this.world.position.getX(), this.world.position.getY(), this.world.position.getZ());
 
         if (OpenGlHelper.shadersSupported && ConfigurationHandler.enableAlpha) {
             GL20.glUseProgram(SHADER_ALPHA.getProgram());
@@ -306,7 +303,7 @@ public class RenderSchematic extends RenderGlobal {
             tessellator.drawCuboid(ClientProxy.pointMin, ClientProxy.pointMax, GeometryMasks.Line.ALL, 0x7F00BF00);
         }
         if (isRenderingSchematic) {
-            this.tmp.set(schematic.position.x + schematic.getWidth() - 1, schematic.position.y + schematic.getHeight() - 1, schematic.position.z + schematic.getLength() - 1);
+            this.tmp = new BlockPos(schematic.position.getX() + schematic.getWidth() - 1, schematic.position.getY() + schematic.getHeight() - 1, schematic.position.getZ() + schematic.getLength() - 1);
             tessellator.drawCuboid(schematic.position, this.tmp, GeometryMasks.Line.ALL, 0x7FBF00BF);
         }
         tessellator.draw();
@@ -895,8 +892,8 @@ public class RenderSchematic extends RenderGlobal {
             return;
         }
 
-        final MBlockPos position = this.world.position;
-        this.viewFrustum.markBlocksForUpdate(x1 - position.x, y1 - position.y, z1 - position.z, x2 - position.x, y2 - position.y, z2 - position.z, needsUpdate);
+        final BlockPos position = this.world.position;
+        this.viewFrustum.markBlocksForUpdate(x1 - position.getX(), y1 - position.getY(), z1 - position.getZ(), x2 - position.getX(), y2 - position.getY(), z2 - position.getZ(), needsUpdate);
     }
 
     @Override

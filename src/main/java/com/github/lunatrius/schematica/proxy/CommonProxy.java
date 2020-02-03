@@ -1,6 +1,5 @@
 package com.github.lunatrius.schematica.proxy;
 
-import com.github.lunatrius.core.util.math.MBlockPos;
 import com.github.lunatrius.schematica.api.ISchematic;
 import com.github.lunatrius.schematica.command.CommandSchematicaList;
 import com.github.lunatrius.schematica.command.CommandSchematicaRemove;
@@ -102,8 +101,6 @@ public abstract class CommonProxy {
     }
 
     public void copyChunkToSchematic(final ISchematic schematic, final World world, final int chunkX, final int chunkZ, final int minX, final int maxX, final int minY, final int maxY, final int minZ, final int maxZ) {
-        final MBlockPos pos = new MBlockPos();
-        final MBlockPos localPos = new MBlockPos();
         final int localMinX = minX < (chunkX << 4) ? 0 : (minX & 15);
         final int localMaxX = maxX > ((chunkX << 4) + 15) ? 15 : (maxX & 15);
         final int localMinZ = minZ < (chunkZ << 4) ? 0 : (minZ & 15);
@@ -119,8 +116,8 @@ public abstract class CommonProxy {
                     final int localY = y - minY;
                     final int localZ = z - minZ;
 
-                    pos.set(x, y, z);
-                    localPos.set(localX, localY, localZ);
+                    BlockPos pos = new BlockPos(x, y, z);
+                    BlockPos localPos = new BlockPos(localX, localY, localZ);
 
                     try {
                         final IBlockState blockState = world.getBlockState(pos);

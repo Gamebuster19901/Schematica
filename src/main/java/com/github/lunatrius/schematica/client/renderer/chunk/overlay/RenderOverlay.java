@@ -1,7 +1,7 @@
 package com.github.lunatrius.schematica.client.renderer.chunk.overlay;
 
-import com.github.lunatrius.core.client.renderer.GeometryMasks;
-import com.github.lunatrius.core.client.renderer.GeometryTessellator;
+import com.github.lunatrius.schematica.client.renderer.GeometryMasks;
+import com.github.lunatrius.schematica.client.renderer.GeometryTessellator;
 import com.github.lunatrius.schematica.client.renderer.chunk.CompiledOverlay;
 import com.github.lunatrius.schematica.client.world.SchematicWorld;
 import com.github.lunatrius.schematica.handler.ConfigurationHandler;

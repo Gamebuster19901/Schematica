@@ -1,8 +1,5 @@
 package com.github.lunatrius.schematica.client.util;
 
-import com.github.lunatrius.core.entity.EntityHelper;
-import com.github.lunatrius.core.util.math.BlockPosHelper;
-import com.github.lunatrius.core.util.math.MBlockPos;
 import com.github.lunatrius.schematica.block.state.BlockStateHelper;
 import com.github.lunatrius.schematica.client.world.SchematicWorld;
 import com.github.lunatrius.schematica.reference.Reference;
@@ -34,9 +31,8 @@ public class BlockList {
         }
 
         final RayTraceResult rtr = new RayTraceResult(player);
-        final MBlockPos mcPos = new MBlockPos();
 
-        for (final MBlockPos pos : BlockPosHelper.getAllInBox(BlockPos.ORIGIN, new BlockPos(world.getWidth() - 1, world.getHeight() - 1, world.getLength() - 1))) {
+        for (final BlockPos pos : BlockPos.getAllInBox(BlockPos.ORIGIN, new BlockPos(world.getWidth() - 1, world.getHeight() - 1, world.getLength() - 1))) {
             if (!world.layerMode.shouldUseLayer(world, pos.getY())) {
                 continue;
             }
@@ -48,7 +44,7 @@ public class BlockList {
                 continue;
             }
 
-            mcPos.set(world.position.add(pos));
+            BlockPos mcPos = new BlockPos(world.position.add(pos));
 
             final IBlockState mcBlockState = mcWorld.getBlockState(mcPos);
             final boolean isPlaced = BlockStateHelper.areBlockStatesEqual(blockState, mcBlockState);
@@ -102,7 +98,12 @@ public class BlockList {
             if (player.capabilities.isCreativeMode) {
                 wrappedItemStack.inventory = -1;
             } else {
-                wrappedItemStack.inventory = EntityHelper.getItemCountInInventory(player.inventory, wrappedItemStack.itemStack.getItem(), wrappedItemStack.itemStack.getItemDamage());
+            	wrappedItemStack.inventory = 0;
+            	for(ItemStack i : player.inventory.mainInventory) {
+            		if(i.isItemEqual(wrappedItemStack.itemStack)) {
+            			wrappedItemStack.inventory += i.getCount();
+            		}
+            	}
             }
         }
 

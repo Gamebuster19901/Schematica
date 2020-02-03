@@ -1,6 +1,6 @@
 package com.github.lunatrius.schematica.block.state.pattern;
 
-import com.github.lunatrius.core.exceptions.LocalizedException;
+import com.github.lunatrius.schematica.exception.LocalizedException;
 import com.github.lunatrius.schematica.reference.Names;
 import com.google.common.base.Predicate;
 import net.minecraft.block.Block;

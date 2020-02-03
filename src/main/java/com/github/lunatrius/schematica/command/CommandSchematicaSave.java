@@ -1,6 +1,5 @@
 package com.github.lunatrius.schematica.command;
 
-import com.github.lunatrius.core.util.math.MBlockPos;
 import com.github.lunatrius.schematica.Schematica;
 import com.github.lunatrius.schematica.reference.Constants;
 import com.github.lunatrius.schematica.reference.Names;
@@ -13,6 +12,7 @@ import net.minecraft.command.NumberInvalidException;
 import net.minecraft.command.WrongUsageException;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentTranslation;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -47,15 +47,15 @@ public class CommandSchematicaSave extends CommandSchematicaBase {
             throw new CommandException(Names.Command.Save.Message.QUOTA_EXCEEDED);
         }
 
-        final MBlockPos from = new MBlockPos();
-        final MBlockPos to = new MBlockPos();
+        BlockPos from = new BlockPos(0,0,0);
+        BlockPos to = new BlockPos(0,0,0);
         final String filename;
         final String name;
         final String format;
 
         try {
-            from.set(parseCoord(args[0]), parseCoord(args[1]), parseCoord(args[2]));
-            to.set(parseCoord(args[3]), parseCoord(args[4]), parseCoord(args[5]));
+            from = new BlockPos(parseCoord(args[0]), parseCoord(args[1]), parseCoord(args[2]));
+            to = new BlockPos(parseCoord(args[3]), parseCoord(args[4]), parseCoord(args[5]));
 
             name = args[6];
             if (args.length >= 8) {

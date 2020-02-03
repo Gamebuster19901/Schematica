@@ -1,7 +1,5 @@
 package com.github.lunatrius.schematica.proxy;
 
-import com.github.lunatrius.core.util.math.MBlockPos;
-import com.github.lunatrius.core.util.vector.Vector3d;
 import com.github.lunatrius.schematica.api.ISchematic;
 import com.github.lunatrius.schematica.client.printer.SchematicPrinter;
 import com.github.lunatrius.schematica.client.renderer.RenderSchematic;
@@ -20,8 +18,10 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.client.ClientCommandHandler;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Property;
@@ -38,16 +38,16 @@ public class ClientProxy extends CommonProxy {
     public static boolean isRenderingGuide = false;
     public static boolean isPendingReset = false;
 
-    public static final Vector3d playerPosition = new Vector3d();
+    public static Vec3d playerPosition = new Vec3d(0,0,0);
     public static EnumFacing orientation = null;
     public static int rotationRender = 0;
 
     public static SchematicWorld schematic = null;
 
-    public static final MBlockPos pointA = new MBlockPos();
-    public static final MBlockPos pointB = new MBlockPos();
-    public static final MBlockPos pointMin = new MBlockPos();
-    public static final MBlockPos pointMax = new MBlockPos();
+    public static BlockPos pointA = new BlockPos(0,0,0);
+    public static BlockPos pointB = new BlockPos(0,0,0);
+    public static BlockPos pointMin = new BlockPos(0,0,0);
+    public static BlockPos pointMax = new BlockPos(0,0,0);
 
     public static EnumFacing axisFlip = EnumFacing.UP;
     public static EnumFacing axisRotation = EnumFacing.UP;
@@ -57,10 +57,12 @@ public class ClientProxy extends CommonProxy {
     private static final Minecraft MINECRAFT = Minecraft.getMinecraft();
 
     public static void setPlayerData(final EntityPlayer player, final float partialTicks) {
-        playerPosition.x = player.lastTickPosX + (player.posX - player.lastTickPosX) * partialTicks;
-        playerPosition.y = player.lastTickPosY + (player.posY - player.lastTickPosY) * partialTicks;
-        playerPosition.z = player.lastTickPosZ + (player.posZ - player.lastTickPosZ) * partialTicks;
+    	double x = player.lastTickPosX + (player.posX - player.lastTickPosX) * partialTicks;
+        double y = player.lastTickPosY + (player.posY - player.lastTickPosY) * partialTicks;
+        double z = player.lastTickPosZ + (player.posZ - player.lastTickPosZ) * partialTicks;
 
+        playerPosition = new Vec3d(x,y,z);
+        
         orientation = getOrientation(player);
 
         rotationRender = MathHelper.floor(player.rotationYaw / 90) & 3;
@@ -88,66 +90,72 @@ public class ClientProxy extends CommonProxy {
     }
 
     public static void updatePoints() {
-        pointMin.x = Math.min(pointA.x, pointB.x);
-        pointMin.y = Math.min(pointA.y, pointB.y);
-        pointMin.z = Math.min(pointA.z, pointB.z);
+    	int minX = Math.min(pointA.getX(), pointB.getX());
+        int minY = Math.min(pointA.getY(), pointB.getY());
+        int minZ = Math.min(pointA.getZ(), pointB.getZ());
+        pointMin = new BlockPos(minX, minY, minZ);
 
-        pointMax.x = Math.max(pointA.x, pointB.x);
-        pointMax.y = Math.max(pointA.y, pointB.y);
-        pointMax.z = Math.max(pointA.z, pointB.z);
+        int maxX = Math.max(pointA.getX(), pointB.getX());
+        int maxY = Math.max(pointA.getY(), pointB.getY());
+        int maxZ = Math.max(pointA.getZ(), pointB.getZ());
+        pointMax = new BlockPos(maxX, maxY, maxZ);
     }
 
-    public static void movePointToPlayer(final MBlockPos point) {
-        point.x = (int) Math.floor(playerPosition.x);
-        point.y = (int) Math.floor(playerPosition.y);
-        point.z = (int) Math.floor(playerPosition.z);
+    public static Vec3d movePointToPlayer(final BlockPos point) {
+        double x = (int) Math.floor(playerPosition.x);
+        double y = (int) Math.floor(playerPosition.y);
+        double z = (int) Math.floor(playerPosition.z);
 
         switch (rotationRender) {
         case 0:
-            point.x -= 1;
-            point.z += 1;
+            x -= 1;
+            z += 1;
             break;
         case 1:
-            point.x -= 1;
-            point.z -= 1;
+            x -= 1;
+            z -= 1;
             break;
         case 2:
-            point.x += 1;
-            point.z -= 1;
+            x += 1;
+            z -= 1;
             break;
         case 3:
-            point.x += 1;
-            point.z += 1;
+            x += 1;
+            z += 1;
             break;
         }
+        
+        return new Vec3d(x,y,z);
     }
 
-    public static void moveSchematicToPlayer(final SchematicWorld schematic) {
+    public static Vec3d moveSchematicToPlayer(final SchematicWorld schematic) {
         if (schematic != null) {
-            final MBlockPos position = schematic.position;
-            position.x = (int) Math.floor(playerPosition.x);
-            position.y = (int) Math.floor(playerPosition.y);
-            position.z = (int) Math.floor(playerPosition.z);
+            BlockPos position = schematic.position;
+            double x = (int) Math.floor(playerPosition.x);
+            double y = (int) Math.floor(playerPosition.y);
+            double z = (int) Math.floor(playerPosition.z);
 
             switch (rotationRender) {
             case 0:
-                position.x -= schematic.getWidth();
-                position.z += 1;
+                x -= schematic.getWidth();
+                z += 1;
                 break;
             case 1:
-                position.x -= schematic.getWidth();
-                position.z -= schematic.getLength();
+                x -= schematic.getWidth();
+                z -= schematic.getLength();
                 break;
             case 2:
-                position.x += 1;
-                position.z -= schematic.getLength();
+                x += 1;
+                z -= schematic.getLength();
                 break;
             case 3:
-                position.x += 1;
-                position.z += 1;
+                x += 1;
+                z += 1;
                 break;
             }
+            return new Vec3d(position.getX() + x,position.getY() + y, position.getZ() + z);
         }
+        return Vec3d.ZERO;
     }
 
     @Override
@@ -214,12 +222,12 @@ public class ClientProxy extends CommonProxy {
 
         isRenderingGuide = false;
 
-        playerPosition.set(0, 0, 0);
+        playerPosition = new Vec3d(0, 0, 0);
         orientation = null;
         rotationRender = 0;
 
-        pointA.set(0, 0, 0);
-        pointB.set(0, 0, 0);
+        pointA = new BlockPos(0,0,0);
+        pointB = new BlockPos(0,0,0);
         updatePoints();
     }
 

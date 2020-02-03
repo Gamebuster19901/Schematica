@@ -1,6 +1,5 @@
 package com.github.lunatrius.schematica.command;
 
-import com.github.lunatrius.core.util.FileUtils;
 import com.github.lunatrius.schematica.Schematica;
 import com.github.lunatrius.schematica.reference.Names;
 import com.github.lunatrius.schematica.reference.Reference;
@@ -80,7 +79,7 @@ public class CommandSchematicaList extends CommandSchematicaBase {
             if (currentFile >= pageStart && currentFile < pageEnd) {
                 final String fileName = path.getName();
 
-                final ITextComponent chatComponent = new TextComponentString(String.format("%2d (%s): %s [", currentFile + 1, FileUtils.humanReadableByteCount(path.length()), FilenameUtils.removeExtension(fileName)));
+                final ITextComponent chatComponent = new TextComponentString(String.format("%2d (%s): %s [", currentFile + 1, org.apache.commons.io.FileUtils.byteCountToDisplaySize(path.length()), FilenameUtils.removeExtension(fileName)));
 
                 final String removeCommand = String.format("/%s %s", Names.Command.Remove.NAME, fileName);
                 final ITextComponent removeLink = withStyle(new TextComponentTranslation(Names.Command.List.Message.REMOVE), TextFormatting.RED, removeCommand);

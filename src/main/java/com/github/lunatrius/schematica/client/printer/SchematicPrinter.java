@@ -1,7 +1,5 @@
 package com.github.lunatrius.schematica.client.printer;
 
-import com.github.lunatrius.core.util.math.BlockPosHelper;
-import com.github.lunatrius.core.util.math.MBlockPos;
 import com.github.lunatrius.schematica.block.state.BlockStateHelper;
 import com.github.lunatrius.schematica.client.printer.nbtsync.NBTSync;
 import com.github.lunatrius.schematica.client.printer.nbtsync.SyncRegistry;
@@ -90,9 +88,9 @@ public class SchematicPrinter {
     }
 
     public boolean print(final WorldClient world, final EntityPlayerSP player) {
-        final double dX = ClientProxy.playerPosition.x - this.schematic.position.x;
-        final double dY = ClientProxy.playerPosition.y - this.schematic.position.y;
-        final double dZ = ClientProxy.playerPosition.z - this.schematic.position.z;
+        final double dX = ClientProxy.playerPosition.x - this.schematic.position.getX();
+        final double dY = ClientProxy.playerPosition.y - this.schematic.position.getY();
+        final double dZ = ClientProxy.playerPosition.z - this.schematic.position.getZ();
         final int x = (int) Math.floor(dX);
         final int y = (int) Math.floor(dY);
         final int z = (int) Math.floor(dZ);
@@ -132,7 +130,7 @@ public class SchematicPrinter {
 
         final double blockReachDistance = this.minecraft.playerController.getBlockReachDistance() - 0.1;
         final double blockReachDistanceSq = blockReachDistance * blockReachDistance;
-        for (final MBlockPos pos : BlockPosHelper.getAllInBoxXZY(minX, minY, minZ, maxX, maxY, maxZ)) {
+        for (final BlockPos pos : BlockPos.getAllInBox(minX, minY, minZ, maxX, maxY, maxZ)) {
             if (pos.distanceSqToCenter(dX, dY, dZ) > blockReachDistanceSq) {
                 continue;
             }
@@ -165,9 +163,9 @@ public class SchematicPrinter {
             return false;
         }
 
-        final int wx = this.schematic.position.x + x;
-        final int wy = this.schematic.position.y + y;
-        final int wz = this.schematic.position.z + z;
+        final int wx = this.schematic.position.getX() + x;
+        final int wy = this.schematic.position.getY() + y;
+        final int wz = this.schematic.position.getZ() + z;
         final BlockPos realPos = new BlockPos(wx, wy, wz);
 
         final IBlockState blockState = this.schematic.getBlockState(pos);

@@ -1,7 +1,5 @@
 package com.github.lunatrius.schematica.client.world;
 
-import com.github.lunatrius.core.util.math.BlockPosHelper;
-import com.github.lunatrius.core.util.math.MBlockPos;
 import com.github.lunatrius.schematica.api.ISchematic;
 import com.github.lunatrius.schematica.block.state.pattern.BlockStateReplacer;
 import com.github.lunatrius.schematica.client.world.chunk.ChunkProviderSchematic;
@@ -70,7 +68,7 @@ public class SchematicWorld extends WorldClient {
 
     private ISchematic schematic;
 
-    public final MBlockPos position = new MBlockPos();
+    public BlockPos position = new BlockPos(0,0,0);
     public boolean isRendering = false;
     public LayerMode layerMode = LayerMode.ALL;
     public int renderingLayer = 0;
@@ -231,8 +229,7 @@ public class SchematicWorld extends WorldClient {
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public int replaceBlock(final BlockStateMatcher matcher, final BlockStateReplacer replacer, final Map<IProperty, Comparable> properties) {
         int count = 0;
-
-        for (final MBlockPos pos : BlockPosHelper.getAllInBox(0, 0, 0, getWidth(), getHeight(), getLength())) {
+        for (final BlockPos pos : BlockPos.getAllInBox(0, 0, 0, getWidth(), getHeight(), getLength())) {
             final IBlockState blockState = this.schematic.getBlockState(pos);
 
             // TODO: add support for tile entities?

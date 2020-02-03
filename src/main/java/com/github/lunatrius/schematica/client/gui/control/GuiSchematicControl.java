@@ -1,8 +1,8 @@
 package com.github.lunatrius.schematica.client.gui.control;
 
-import com.github.lunatrius.core.client.gui.GuiNumericField;
-import com.github.lunatrius.core.client.gui.GuiScreenBase;
 import com.github.lunatrius.schematica.Schematica;
+import com.github.lunatrius.schematica.client.gui.GuiNumericField;
+import com.github.lunatrius.schematica.client.gui.GuiScreenBase;
 import com.github.lunatrius.schematica.client.printer.SchematicPrinter;
 import com.github.lunatrius.schematica.client.renderer.RenderSchematic;
 import com.github.lunatrius.schematica.client.util.FlipHelper;
@@ -166,14 +166,8 @@ public class GuiSchematicControl extends GuiScreenBase {
                 return;
             }
 
-            if (guiButton.id == this.numericX.id) {
-                this.schematic.position.x = this.numericX.getValue();
-                RenderSchematic.INSTANCE.refresh();
-            } else if (guiButton.id == this.numericY.id) {
-                this.schematic.position.y = this.numericY.getValue();
-                RenderSchematic.INSTANCE.refresh();
-            } else if (guiButton.id == this.numericZ.id) {
-                this.schematic.position.z = this.numericZ.getValue();
+            if (guiButton.id == this.numericX.id || guiButton.id == this.numericY.id || guiButton.id == this.numericZ.id) {
+                this.schematic.position = new BlockPos(this.numericX.getValue(), this.numericY.getValue(), this.numericZ.getValue());
                 RenderSchematic.INSTANCE.refresh();
             } else if (guiButton.id == this.btnUnload.id) {
                 Schematica.proxy.unloadSchematic();
